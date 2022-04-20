@@ -18,6 +18,7 @@ Feature: Criar usuário
             * def deletar = call read("hook.feature@delete")
 
         Scenario: Registrar um novo usuário com email já existente
+            * def payload = { name: "Vitor Galinari", email: "vitor@galinari.com"}
             * def registrar = call read("hook.feature@post")
             And request payload
             When method post
