@@ -8,8 +8,8 @@ Feature: Atualizar um usuário
         And path "users"
 
         Scenario: Atualizar informações de um usuário
-        * def registrar = call read("hook.feature@post")
-            And path registrar.response.id
+        * def registra = call read("hook.feature@postAleatorio")
+            And path registra.response.id
         #Usuário identificado pelo id. (Critério de aceite 1)
             And request { name: "VitorGalinari", email: "vitor14@galinari.com"}
         #Com o request eu coloco as informações necessárias para atualizar um usuário, que no caso são: nome e email. (Critério de aceite 3)
@@ -19,10 +19,60 @@ Feature: Atualizar um usuário
             * def userId = response.id
             * def deletar = call read("hook.feature@delete")
 
-        Scenario: Atualizar usuário com email inválido
+        Scenario: Atualizar um usuário com email já existente
+            * def abacate = java.util.UUID.randomUUID() + "@abacates.com"
+            And request { name: "Os Abacates", email: "#(abacate)"}
+            When method post
+            Then status 201
+            * def randomEmail = response.email
+            * def registrar = call read("hook.feature@postAleatorio")
+            Given path "users"
+            And path registrar.response.id
+            And request { name: "VitorGalinari", email: "#(randomEmail)"}
+            When method put
+            Then status 422
+            And match response contains { error: "E-mail already in use."}
+            * def userId = registrar.response.id
+            * def deletar = call read("hook.feature@delete")
+        #Na tentativa de atualizar um usuário com um email que já é utilizado por outro usuário, deve ter o response code 400. (Critério de aceite 3)
+        #Com o match response contains eu consigo testar se no response body aparece a mensagem "User already exists.". (Critério de aceite 4)
+
+        Scenario: Atualizar um usuário sem o nome
+        * def registrar = call read("hook.feature@postAleatorio")
+            And path registrar.response.id
+            And request { name: "", email: "vitor@galinari.com"}
+            When method put
+            Then status 400
+        #Como eu não coloquei o nome que é uma das informações necessárias para cadastrar um usuário, eu obtenho o erro 400. (Critério de aceite 3)
+
+        Scenario: Atualizar um usuário sem o nome
+        * def registrar = call read("hook.feature@postAleatorio")
+            And path registrar.response.id
+            And request { name: "Vitor Galinari", email: ""}
+            When method put
+            Then status 400
+        #Como eu não coloquei o email que é uma das informações necessárias para cadastrar um usuário, eu obtenho o erro 400. (Critério de aceite 3)
+
+        Scenario: Atualizar um usuário sem o nome
+        * def registrar = call read("hook.feature@postAleatorio")
+            And path registrar.response.id
+            And request { name: "", email: ""}
+            When method put
+            Then status 400
+        #Como eu não coloquei o nome e o email que são as informações necessárias para cadastrar um usuário, eu obtenho o erro 400. (Critério de aceite 1)
+
+        Scenario: Atualizar usuário com email sem o @
         * def registrar = call read("hook.feature@postAleatorio")
             And path registrar.response.id
             And request { name: "Vitor Galinari", email: "vitorgalinari.com"}
+            When method put
+            Then status 400
+        #O email informado possuindo o formato inválido deve fazer com que a operação seja cancelada, me retornando um response code 400. (Critério de aceite 4)
+
+        Scenario: Atualizar usuário com email sem o .com
+        * def registrar = call read("hook.feature@postAleatorio")
+            And path registrar.response.id
+            And request { name: "Vitor Galinari", email: "vitor@galinari"}
             When method put
             Then status 400
         #O email informado possuindo o formato inválido deve fazer com que a operação seja cancelada, me retornando um response code 400. (Critério de aceite 4)

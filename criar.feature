@@ -4,12 +4,12 @@ Feature: Criar usuário
     Para poder manipular estas informações livremente
 
     Background: Informações importantes
-        * def payload = { name: "Vitor Galinari", email: "vitor@galinari.com"}
         Given url baseUrl
         And path "users"
     #Com o def payload eu coloco as informações necessárias para cadastrar um usuário, que no caso são: nome e email. (Critério de aceite 1)
 
         Scenario: Registra um novo usuário
+            * def payload = { name: "Vitor Galinari", email: "vitor@galinari.com"}
             And request payload
             When method post
             Then status 201

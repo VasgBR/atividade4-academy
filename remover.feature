@@ -18,4 +18,4 @@ Feature: Remover um usuário
             And path java.util.UUID.randomUUID()
             When method delete
             Then status 204
-        #O usuário não vai ser localizado pelo id, porque ele foi excluido, mas mesmo assim eu obtenho o response code 204. (Critério de aceite 2)
+        #O usuário não vai ser localizado pelo id, porque ele não foi cadastrado, mas mesmo assim eu obtenho o response code 204. (Critério de aceite 2)
